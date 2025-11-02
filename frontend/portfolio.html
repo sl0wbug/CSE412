@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Portfolio Page</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Personal Information</h2>
+    <textarea rows="5" cols="60" placeholder="Enter your personal information here..."></textarea>
+    <br><br>
+
+    <h2>Skill</h2>
+    <textarea rows="4" cols="60" placeholder="Enter your skills here..."></textarea>
+    <br><br>
+
+    <h2>Academic Background</h2>
+    <button type="button">Skip</button><br>
+    <textarea rows="4" cols="60" placeholder="Enter your academic background here..."></textarea>
+    <br><br>
+
+    <h2>Work Experience</h2>
+    <button type="button">Skip</button><br>
+    <textarea rows="4" cols="60" placeholder="Enter your work experience here..."></textarea>
+    <br><br>
+
+    <h2>Projects and Publications</h2>
+    <button type="button">Skip</button><br>
+    <textarea rows="4" cols="60" placeholder="Enter your projects or publications here..."></textarea>
+    <br><br>
+
+    <button type="submit">Save Portfolio</button>
+  </div>
+
+  <script>
+    const email = localStorage.getItem("email");
+    if (!email) window.location.href = "login.html";
+
+    const textareas = document.querySelectorAll("textarea");
+    const saveBtn = document.querySelector("button[type='submit']");
+
+    async function loadPortfolio() {
+      const res = await fetch(`http://localhost:3000/getPortfolio/${email}`);
+      if (res.ok) {
+        const data = await res.json();
+        const keys = Object.keys(data);
+        textareas.forEach((t, i) => {
+          if (data[keys[i]]) t.value = data[keys[i]];
+        });
+      }
+    }
+
+    saveBtn.addEventListener("click", async () => {
+      const portfolio = {
+        personalInfo: textareas[0].value,
+        skills: textareas[1].value,
+        academic: textareas[2].value,
+        experience: textareas[3].value,
+        projects: textareas[4].value
+      };
+
+      const res = await fetch("http://localhost:3000/savePortfolio", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, portfolio })
+      });
+
+      const data = await res.json();
+      alert(data.message);
+    });
+
+    loadPortfolio();
+  </script>
+</body>
+</html>

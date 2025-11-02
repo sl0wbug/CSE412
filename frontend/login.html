@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login | Portfolio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2 id="form-title">Login</h2>
+
+    <form id="auth-form">
+      <input type="email" id="email" placeholder="Enter your email" required>
+      <input type="password" id="password" placeholder="Enter your password" required>
+
+      <button type="submit" id="login-btn">Login</button>
+      <button type="button" id="register-btn" class="secondary">Register</button>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById("auth-form");
+    const loginBtn = document.getElementById("login-btn");
+    const registerBtn = document.getElementById("register-btn");
+
+    let isRegisterMode = false;
+
+    // Toggle between Login and Register mode
+    registerBtn.addEventListener("click", async () => {
+      if (!isRegisterMode) {
+        // Switch to register mode
+        document.getElementById("form-title").innerText = "Register";
+        loginBtn.innerText = "Register";
+        registerBtn.innerText = "Back to Login";
+        isRegisterMode = true;
+      } else {
+        // Switch back to login mode
+        document.getElementById("form-title").innerText = "Login";
+        loginBtn.innerText = "Login";
+        registerBtn.innerText = "Register";
+        isRegisterMode = false;
+      }
+    });
+
+    // Form submit (login or register)
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      const route = isRegisterMode ? "register" : "login";
+      const res = await fetch(`http://localhost:3000/${route}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message);
+        if (!isRegisterMode) {
+          localStorage.setItem("email", email);
+          window.location.href = "portfolio.html";
+        } else {
+          // after registration, go back to login mode
+          registerBtn.click();
+        }
+      } else {
+        alert(data.message);
+      }
+    });
+  </script>
+</body>
+</html>
